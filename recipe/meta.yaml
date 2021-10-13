@@ -16,7 +16,7 @@ build:
   skip: true  # [win]
 
 requirements:
-  build:
+  host:
     - autoconf
     - automake
     - make
@@ -24,7 +24,6 @@ requirements:
     - {{ pin_compatible('libunwind', max_pin='x.x') }}  # [linux]
     - {{ compiler('c') }}
     - {{ compiler('cxx') }}
-  host:
     - libunwind  # [linux]
   run:
     - perl
