@@ -21,7 +21,7 @@ requirements:
     - automake
     - make
     - libtool
-    - {{ pin_compatible('libunwind', max_pin='x.x') }}  # [linux]
+    #- {{ pin_compatible('libunwind', max_pin='x.x') }}  # [linux]
     - {{ compiler('c') }}
     - {{ compiler('cxx') }}
     - libunwind  # [linux]
