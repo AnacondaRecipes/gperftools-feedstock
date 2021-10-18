@@ -10,12 +10,10 @@ source:
   fn: {{ name }}-{{ version }}.tar.gz
   url: https://github.com/{{name}}/{{name}}/archive/{{name}}-{{version}}.tar.gz
   sha256: {{ sha256 }}
-  # locking up the s390x prefect build node
-  skip: true  # [s390x]
 
 build:
   number: 0
-  skip: true  # [win]
+  skip: true  # [win or s390x]
   missing_dso_whitelist:         # [linux]
     - "*/libpthread.so.*"        # [linux]
     - "*/libm.so.*"              # [linux]
