@@ -1,6 +1,6 @@
 {% set name = "gperftools" %}
-{% set version = "2.7" %}
-{% set sha256 = "3a88b4544315d550c87db5c96775496243fb91aa2cea88d2b845f65823f3d38a" %}
+{% set version = "2.9.1" %}
+{% set sha256 = "484a88279d2fa5753d7e9dea5f86954b64975f20e796a6ffaf2f3426a674a06a" %}
 
 package:
   name: {{ name|lower }}
@@ -12,19 +12,24 @@ source:
   sha256: {{ sha256 }}
 
 build:
-  number: 2
-  skip: true  # [win]
+  number: 0
+  skip: true  # [win or s390x]
+  missing_dso_whitelist:         # [linux]
+    - "*/libpthread.so.*"        # [linux]
+    - "*/libm.so.*"              # [linux]
+    - "*/libc.so.*"              # [linux]
+    - "*/ld-linux-x86-64.so.*"   # [linux and x86_64]
+    - "*/ld-linux-aarch64.so.*"  # [linux and aarch64]
 
 requirements:
-  build:
+  host:
     - autoconf
     - automake
     - make
     - libtool
-    - {{ pin_compatible('libunwind', max_pin='x.x') }}  # [linux]
+    #- {{ pin_compatible('libunwind', max_pin='x.x') }}  # [linux]
     - {{ compiler('c') }}
     - {{ compiler('cxx') }}
-  host:
     - libunwind  # [linux]
   run:
     - perl
