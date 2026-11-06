@@ -6,9 +6,7 @@ cp $BUILD_PREFIX/share/gnuconfig/config.* .
 
 if [[ "$target_platform" == osx-* ]]; then
   export CFLAGS="$CFLAGS -D_XOPEN_SOURCE"
-  ./configure --prefix="$PREFIX" \
-    --disable-debugalloc \
-    --disable-libunwind
+  ./configure --prefix="$PREFIX" --disable-libunwind
 else
   if [[ $target_platform == *aarch64 ]]; then
     # to match PBP worker
