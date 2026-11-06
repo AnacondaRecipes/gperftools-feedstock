@@ -1,22 +1,20 @@
 #!/bin/bash
+set -ex
 
-if [ $(uname) == Darwin ]; then
-  export MACOSX_DEPLOYMENT_TARGET="10.9"
+# Get an updated config.sub and config.guess
+cp $BUILD_PREFIX/share/gnuconfig/config.* .
+
+if [[ "$target_platform" == osx-* ]]; then
   export CFLAGS="$CFLAGS -D_XOPEN_SOURCE"
-  
-  autoreconf -fiv
-  ./configure  --prefix $PREFIX \
-    CC=clang \
-    CXX=clang++ \
+  ./configure --prefix="$PREFIX" \
     --disable-debugalloc \
-    --disable-dependency-tracking \
     --disable-libunwind
-  make
-  make install
 else
-  ./autogen.sh
-  ./configure  --prefix $PREFIX --enable-libunwind
-  make
-  make check
-  make install
+  ./configure --prefix="$PREFIX" --enable-libunwind --enable-frame-pointers
 fi
+
+make -j"${CPU_COUNT}"
+
+make check
+
+make install
