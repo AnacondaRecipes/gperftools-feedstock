@@ -10,7 +10,11 @@ if [[ "$target_platform" == osx-* ]]; then
     --disable-debugalloc \
     --disable-libunwind
 else
-  ./configure --prefix="$PREFIX" --enable-libunwind --enable-frame-pointers
+  if [[ $target_platform == *aarch64 ]]; then
+    # to match PBP worker
+    EXTRA=--with-tcmalloc-pagesize=64
+  fi
+  ./configure --prefix="$PREFIX" --enable-libunwind --enable-frame-pointers $EXTRA
 fi
 
 make -j"${CPU_COUNT}"
