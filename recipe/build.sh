@@ -1,22 +1,22 @@
 #!/bin/bash
+set -exo pipefail
 
-if [ $(uname) == Darwin ]; then
-  export MACOSX_DEPLOYMENT_TARGET="10.9"
+# Get an updated config.sub and config.guess
+cp $BUILD_PREFIX/share/gnuconfig/config.* .
+
+if [[ "$target_platform" == osx-* ]]; then
   export CFLAGS="$CFLAGS -D_XOPEN_SOURCE"
-  
-  autoreconf -fiv
-  ./configure  --prefix $PREFIX \
-    CC=clang \
-    CXX=clang++ \
-    --disable-debugalloc \
-    --disable-dependency-tracking \
-    --disable-libunwind
-  make
-  make install
+  ./configure --prefix="$PREFIX" --disable-libunwind
 else
-  ./autogen.sh
-  ./configure  --prefix $PREFIX --enable-libunwind
-  make
-  make check
-  make install
+  if [[ $target_platform == *aarch64 ]]; then
+    # to match PBP worker
+    EXTRA=--with-tcmalloc-pagesize=64
+  fi
+  ./configure --prefix="$PREFIX" --enable-libunwind --enable-frame-pointers $EXTRA
 fi
+
+make -j"${CPU_COUNT}"
+
+make check
+
+make install
