@@ -39,11 +39,9 @@ test:
 
 about:
   home: https://github.com/gperftools/gperftools
-  license: BSD-3-Clause AND 0BSD
+  license: BSD-3-Clause
   license_family: BSD
-  license_file:
-    - COPYING
-    - vendor/aw-backtrace/LICENSE
+  license_file: COPYING # aw-backtrace is not vendored as it requires glibc 2.35+
   summary: 'The fastest malloc we have seen; works particularly well with threads and STL'
   description: |
     gperftools is a collection of a high-performance multi-threaded
