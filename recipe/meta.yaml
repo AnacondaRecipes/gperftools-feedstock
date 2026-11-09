@@ -1,45 +1,47 @@
 {% set name = "gperftools" %}
-{% set version = "2.7" %}
-{% set sha256 = "3a88b4544315d550c87db5c96775496243fb91aa2cea88d2b845f65823f3d38a" %}
+{% set version = "2.19.2" %}
+{% set sha256 = "48a127fa4cf2cf9f2764dddd9340f158245f53b9fe6ab4fbf007ecaf304d8e1a" %}
 
 package:
-  name: {{ name|lower }}
+  name: {{ name }}
   version: {{ version }}
 
 source:
-  fn: {{ name }}-{{ version }}.tar.gz
-  url: https://github.com/{{name}}/{{name}}/archive/{{name}}-{{version}}.tar.gz
+  url: https://github.com/{{ name }}/{{ name }}/releases/download/{{ name }}-{{ version }}/{{ name }}-{{ version }}.tar.gz
   sha256: {{ sha256 }}
 
 build:
-  number: 2
+  number: 0
   skip: true  # [win]
 
 requirements:
   build:
-    - autoconf
-    - automake
     - make
-    - libtool
-    - {{ pin_compatible('libunwind', max_pin='x.x') }}  # [linux]
     - {{ compiler('c') }}
     - {{ compiler('cxx') }}
+    - {{ stdlib('c') }}
+    - gnuconfig  # [unix]
   host:
-    - libunwind  # [linux]
-  run:
-    - perl
+    - libunwind {{ libunwind }}  # [linux]
 
 test:
   requires:
-    - {{ compiler('c') }}
+    - {{ compiler('cxx') }}
+    - pkg-config
   commands:
-    - pprof --help
+    - test -f "$PREFIX/include/gperftools/tcmalloc.h"
+    - test -f "$PREFIX/lib/libtcmalloc${SHLIB_EXT}"
+    - pkg-config --exists libtcmalloc
+    - printf '#include <gperftools/tcmalloc.h>\nint main() { void* p = tc_malloc(16); if (!p) return 1; tc_free(p); return 0; }\n' > smoke.cc
+    - $CXX smoke.cc $(pkg-config --cflags --libs libtcmalloc) -o smoke  # [not osx]
+    - $CXX smoke.cc $(pkg-config --cflags --libs libtcmalloc) -Wl,-rpath,"$PREFIX/lib" -o smoke  # [osx]
+    - ./smoke
 
 about:
-  home: http://github.com/gperftools/gperftools
+  home: https://github.com/gperftools/gperftools
   license: BSD-3-Clause
   license_family: BSD
-  license_file: COPYING
+  license_file: COPYING # aw-backtrace is not vendored as it requires glibc 2.35+
   summary: 'The fastest malloc we have seen; works particularly well with threads and STL'
   description: |
     gperftools is a collection of a high-performance multi-threaded
